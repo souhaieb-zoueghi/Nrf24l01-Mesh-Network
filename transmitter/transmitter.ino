@@ -59,15 +59,15 @@ void loop() {
 
   DHT.read11(DHT_PIN);
   delay(1000);
-  float humidity = DHT.humidity;
-  float temperature = DHT.temperature;
+  float hum = DHT.humidity;
+  float temp = DHT.temperature;
 
 #if DEBUG == 1
 
   Serial.println(co);
   Serial.println(smoke);
-  Serial.println(humidity);
-  Serial.println(temperature);
+  Serial.println(hum);
+  Serial.println(temp);
 
 #endif
 
