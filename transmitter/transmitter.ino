@@ -21,6 +21,7 @@
 
 RF24 radio(CE_PIN, CSN_PIN);
 
+//definition of network addresses
 const byte pipes[][6] = {"1Node","2Node"};
 
 float transmitter_data[DATA_SIZE];
@@ -38,7 +39,8 @@ void setup() {
   mq2.begin();
 
   radio.begin();
-  radio.setPALevel(RF24_PA_MIN);
+  radio.setPALevel(RF24_PA_MIN);  //minimum power level, it reduces the module's range
+  radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(true);
   radio.enableAckPayload();
   radio.enableDynamicPayloads();
@@ -50,9 +52,11 @@ void setup() {
 
 void loop() {
 
+  //get co and smoke from  MQ2 sensor
   float co = mq2.readCO();
   float smoke = mq2.readSmoke();
 
+  //get humidity and temperature from DHT sensor
   DHT.read11(DHT_PIN);
   delay(1000);
   float hum = DHT.humidity;
@@ -95,7 +99,7 @@ void loop() {
     radio.stopListening();
     radio.openWritingPipe(pipes[1]);
 
-    //we put the id of the transceiver to inform the gateway that its down
+    //we specify the id of the transceiver to inform the gateway that its down
     transmitter_data[5] = TRANSCEIVER_ID;
 
     radio.write(&transmitter_data, sizeof(transmitter_data));

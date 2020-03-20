@@ -20,6 +20,7 @@
 
 RF24 radio(CE_PIN, CSN_PIN);
 
+//definition of network addresses
 const byte pipes[][6] = {"1Node","2Node"};
 
 MQ2 mq2(MQ2_PIN);
@@ -38,7 +39,8 @@ void setup() {
   mq2.begin();
 
   radio.begin();
-  radio.setPALevel(RF24_PA_MIN);
+  radio.setPALevel(RF24_PA_MIN); //minimum power level, it reduces the module's range
+  radio.setDataRate(RF24_1MBPS);
   radio.setAutoAck(true);
   radio.enableAckPayload();
   radio.enableDynamicPayloads();
@@ -51,15 +53,18 @@ void setup() {
 
 void loop() {
 
+  //get co and smoke from  MQ2 sensor
   float co = mq2.readCO();
   float smoke = mq2.readSmoke();
 
+  //get humidity and temperature from DHT sensor
   DHT.read11(DHT_PIN);
   delay(1000);
   float hum = DHT.humidity;
   float temp = DHT.temperature;
 
-  transceiver_data[0] = TRANSCEIVER_ID;
+  //we store the sensed data in the array
+  transceiver_data[0] = TRANSCEIVER_ID; //node id
   transceiver_data[1] = co;
   transceiver_data[2] = smoke;
   transceiver_data[3] = hum;
@@ -76,12 +81,14 @@ void loop() {
 
   #endif
 
+ //listen and try to catch transmitter's signal
  if(radio.available()){
 
    transceiver_data[5] = TRANSMITTER_NOT_DOWN;
 
   while (radio.available()){
 
+    //read data sent by transmitter
     radio.read(&transmitter_data, sizeof(transmitter_data));
 
   }
@@ -97,6 +104,7 @@ void loop() {
 
   #endif
 
+  //we must stop listening to send data to the gateway
   radio.stopListening();
 
   radio.write(&transmitter_data, sizeof(transmitter_data));
@@ -112,12 +120,15 @@ void loop() {
 
  }
 
+ //transmitter is down
  if(count >= FAILURE_THRESHOLD){
 
   radio.stopListening();
 
+  //we specify the id of the transmitter to inform the gateway that its down
   transceiver_data[5] = TRANSMITTER_ID;
 
+  //we send only data sensed by this node (transceiver)
   radio.write(&transceiver_data, sizeof(transceiver_data));
   radio.startListening();
 
