@@ -8,3 +8,8 @@ The wireless communication is established through the Nrf24l01 module which oper
 
 ## 3. Wireless Sensors Network Architecture
 ![](images/Network_Architecture.jpg)
+The transmitter measure multiple factors and forward them to the transceiver, which will receive the data and will sent it with it's own sensed data to the Gatway.
+
+## 4. Transmitter Down Case
+ ![](images/transmitter_down_case.jpg)
+ If the transmitter is down for some reasons, the transceiver is capable of detecting that and it will inform the gateway about this issue by adding the transmitter's id to it's payload.
