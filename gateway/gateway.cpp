@@ -24,20 +24,20 @@ using namespace std;
 int main()
 {
 
-	RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_16MHZ);
+  RF24 radio(RPI_V2_GPIO_P1_15, RPI_V2_GPIO_P1_24, BCM2835_SPI_SPEED_16MHZ);
 
-	const uint8_t pipe[6] = {"2Node"};
+  const uint8_t pipe[6] = {"2Node"};
 
-	//variable for storing received data
-	float data[6] = {0};
+  //variable for storing received data
+  float data[6] = {0};
 
-	//variables for formating sql statements
-	char update_temperature[50] = {0};
-	char update_humidity[50] = {0};
-	char update_status[50] = {0};
-	char update_smoke[50] = {0};
+  //variables for formating sql statements
+  char update_temperature[50] = {0};
+  char update_humidity[50] = {0};
+  char update_status[50] = {0};
+  char update_smoke[50] = {0};
 
-	//Nrf24l01 configuration
+  //Nrf24l01 configuration
   radio.begin();
   radio.setAutoAck(true); // Ensure autoACK is enabled
   radio.setRetries(RETRIES_DELAY,RETRIES_NUMBER);
@@ -45,7 +45,7 @@ int main()
   radio.openReadingPipe(1,pipe);
   radio.startListening();
 
-	//variables for detecting when we are exceeding the timeout
+  //variables for detecting when we are exceeding the timeout
   time_t current_time, started_waiting_at;
   int time_waited = 0;
 
@@ -69,7 +69,7 @@ int main()
 			while(radio.available())
 			{
 				radio.read( &data, sizeof(data));
-		  }
+		        }
 
 
 			cout << "Data received from node " << data[0] << endl;
@@ -78,8 +78,8 @@ int main()
 			cout << "Humidity : " << data[3] << "%" << endl;
 			cout << "Temperature : " << data[4] << " C" << endl;
 
-      sprintf(update_temperature, "update capteur set temperature = %d where id=%d", (int)data[4], (int)data[0]);
-		  sprintf(update_humidity, "update capteur set humidity = %d where id=%d", (int)data[3], (int)data[0]);
+                        sprintf(update_temperature, "update capteur set temperature = %d where id=%d", (int)data[4], (int)data[0]);
+		        sprintf(update_humidity, "update capteur set humidity = %d where id=%d", (int)data[3], (int)data[0]);
 			sprintf(update_smoke, "update capteur set gaz = %d where id=%d", (int)data[2], (int)data[0]);
 			sprintf(update_status, "update capteur set is_down = 0 where id=%d", (int)data[0]);
 
@@ -93,9 +93,9 @@ int main()
 				cout << "Node " << data[5] << " is down !!!!" << endl;
 				sprintf(update_status, "update capteur set is_down = 1 where id=%d", (int)data[5]);
 				stmt->execute(update_status);
-		  }
+		        }
 
-	    started_waiting_at = time(NULL);
+	                started_waiting_at = time(NULL);
 
 		}
 
